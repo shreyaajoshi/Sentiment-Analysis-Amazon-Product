@@ -1,0 +1,64 @@
+import pandas as pd
+import gzip
+from nltk import tokenize
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
+
+
+analyser = SIA()
+
+def parse(path):
+  g = gzip.open('/Users/shreyajoshi/Downloads/reviews_Beauty_5.json.gz', 'rb')
+  for l in g:
+    yield eval(l)
+
+def getDF(path):
+  i = 0
+  df = {}
+  count=0;
+  for d in parse(path):
+    if count<10 :
+      df[i] = d
+      i += 1
+      count+=1
+    else:
+      break
+
+  return pd.DataFrame.from_dict(df, orient='index')
+
+def print_sentiment_scores(sentence):
+    ans = analyser.polarity_scores(sentence)
+    return ans['compound']
+
+# def writeToFile(df['asin'],senti_score,flag):
+#     download_dir = "prdtReview.csv"
+#
+#     csv = open(download_dir, "w")
+#     # "w" indicates that you're writing strings to the file
+#
+#     columnTitleRow = "prdt_id, sentiment_score\n"
+#     csv.write(columnTitleRow)
+#
+
+def main():
+    #sentence = "I woke up early this morning and I feel very refreshed! :)"
+    download_dir = "prdtReview.csv"  # where you want the file to be downloaded to
+
+    csv = open(download_dir, "w")
+    # "w" indicates that you're writing strings to the file
+
+    columnTitleRow = "prdt_id, reviewerID, sentiment_score\n"
+    csv.write(columnTitleRow)
+
+    df = getDF('reviews_Beauty_5.json.gz')
+    #print df
+    i=0
+    flag=True
+    for sentence in df['reviewText']:
+        senti_score=print_sentiment_scores(sentence)
+        #writeToFile(df['asin'],senti_score,flag)
+        rowline = df.loc[i,'asin']+","+df.loc[i,'reviewerID']+","+str(senti_score)+"\n"
+        #print rowline
+        csv.write(rowline)
+        i+=1
+
+main()
