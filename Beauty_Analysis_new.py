@@ -1,3 +1,4 @@
+
 '''
 Analyzing Beauty dataset for sentiment
 '''
@@ -29,7 +30,7 @@ def getDF(path):
     df = {}
     count=0;       #uncomment to limit the number of reviews
     for d in parse(path):
-        if count<150 :           #uncomment to limit the number of reviews
+        if count<1500 :           #uncomment to limit the number of reviews
             df[i] = d
             i += 1
             count+=1
@@ -101,8 +102,8 @@ def main():
 
        #match product id to product name from metadata
         this_list = next((item for item in prdt_dict_list if item["asin"] == df.loc[i,'asin']), None)
-        rowline = df.loc[i,'asin']+","+str(this_list['title'])+","+df.loc[i,'reviewerID']+","+str(senti_score)+"\n"
-
+        rowline = df.loc[i, 'asin'] + "," + str(this_list['title']).replace(',', '') + "," + df.loc[
+            i, 'reviewerID'] + "," + str(df.loc[i, 'overall']) + "," + str(df.loc[i, 'reviewTime']).replace(',','') + "," + str(senti_score) + "\n"
         #write to prdt_review.csv
         csv1.write(rowline)
         i+=1
